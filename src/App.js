@@ -14,24 +14,36 @@ function App() {
   const [letra, setLetra] = useState('')
   const [biografia, setBiografia] = useState({})
   const [spinner, setSpinner] = useState(false)
-
+  const [cancion, setCancion] = useState('')
+  const [artista, setArtista] = useState('')
+  
   useEffect(() => {
     if(Object.keys(busquedaLetra).length === 0) return
-
+    
     const consultarAPI_Lyrics = async () => {
+      // Destructuring
       const { artista, cancion } = busquedaLetra
+
       const url = `https://api.lyrics.ovh/v1/${artista}/${cancion}`
       const url2 = `https://www.theaudiodb.com/api/v1/json/1/search.php?s=${artista}`
 
+
+      // Pasar datos al componente lyrics
+      setCancion(cancion)
+      setArtista(artista)
+      
       // Usar Promise para varios consultas asíncronas
       const [ letra, biografia ] = await Promise.all([
         axios.get(url),
         axios.get(url2)
       ])
-
+      
       setLetra(letra.data.lyrics)
       setBiografia(biografia.data.artists[0])
       setSpinner(false)
+
+      // Reiniciar state
+      setBusquedaLetra({})
     }
 
     consultarAPI_Lyrics()
@@ -47,7 +59,9 @@ function App() {
     component1 = <Biografia 
                     biografia={biografia}
                   />
-    component2 = <Lyrics 
+    component2 = <Lyrics
+                  cancion={cancion}
+                  artista={artista}
                   letra={letra}
                 />
   }
